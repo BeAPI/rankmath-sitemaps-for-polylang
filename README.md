@@ -29,23 +29,13 @@ Ensure Rank Math and Polylang are active before relying on sitemap URLs.
 
 ## Development
 
-From the Kiloutou project root (DDEV):
-
-```bash
-ddev composer install -d content/plugins/rankmath-sitemaps-for-polylang
-ddev composer cs -d content/plugins/rankmath-sitemaps-for-polylang
-ddev composer test -d content/plugins/rankmath-sitemaps-for-polylang
-```
-
-From the plugin directory on the host:
-
 ```bash
 composer install
 composer cs
 composer test
 ```
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the release workflow (private Satis package). Test scope: [docs/TESTING_PLAN.md](docs/TESTING_PLAN.md).
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the release workflow (private Satis package).
 
 ## License
 

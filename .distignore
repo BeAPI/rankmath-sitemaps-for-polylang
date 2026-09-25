@@ -24,7 +24,6 @@ package-lock.json
 # Documentation (GitHub)
 README.md
 DEPLOYMENT.md
-docs/
 
 # Development files
 *.log
