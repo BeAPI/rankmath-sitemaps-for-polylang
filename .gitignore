@@ -1,40 +1,32 @@
-# Logs
-logs
+# Directories
+/.git
+/.github
+/.wordpress-org
+/node_modules
+/src
+/tests
+
+# Configuration files
+.distignore
+.editorconfig
+.gitattributes
+.gitignore
+.plugin-data
+.wp-env.json
+grumphp.yml
+phpcs.xml.dist
+
+# Dependency management
+composer.lock
+package.json
+package-lock.json
+
+# Documentation (GitHub)
+README.md
+DEPLOYMENT.md
+
+# Development files
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Coverage directory used by tools like istanbul
-coverage
-
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
-build/
-
-# Dependency directories
-node_modules/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Output of `npm pack`
-*.tgz
-
-# Output of `wp-scripts plugin-zip`
-*.zip
-
-# dotenv environment variables file
-.env
-
-# Composer
-vendor/
-
-# Local extraction / planning notes (not shipped)
-docs/
-
-# PHPUnit
-.phpunit.result.cache
+*.map
+.DS_Store
+Thumbs.db
