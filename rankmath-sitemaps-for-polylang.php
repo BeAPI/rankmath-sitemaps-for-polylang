@@ -5,7 +5,7 @@
  * Description:       Serves one Rank Math XML sitemap per Polylang language (directory mode, hide_default).
  * Version:           1.0.0
  * Requires at least: 6.5
- * Requires PHP:      7.4
+ * Requires PHP:      8.1
  * Requires Plugins:  seo-by-rank-math
  * Author:            Be API
  * Author URI:        https://beapi.fr
@@ -18,7 +18,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'RMSP_VERSION', '1.0.0' );
-define( 'RMSP_FILE', __FILE__ );
+define( 'RMSP_URL', plugin_dir_url( __FILE__ ) );
 define( 'RMSP_DIR', plugin_dir_path( __FILE__ ) );
 
 $rmsp_autoload = RMSP_DIR . 'vendor/autoload.php';
