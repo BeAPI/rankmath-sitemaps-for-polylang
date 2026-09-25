@@ -3,7 +3,7 @@
  * Plugin Name:       Rank Math Sitemaps for Polylang
  * Plugin URI:        https://github.com/beapi/rankmath-sitemaps-for-polylang
  * Description:       Serves one Rank Math XML sitemap per Polylang language (directory mode, hide_default).
- * Version:           1.1.0
+ * Version:           1.1.1
  * Requires at least: 6.5
  * Tested up to:      7.1.2
  * Requires PHP:      8.1
@@ -22,7 +22,7 @@ use RankMath\Sitemap\Router as Rank_Math_Router;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'RMSP_VERSION', '1.1.0' );
+define( 'RMSP_VERSION', '1.1.1' );
 define( 'RMSP_URL', plugin_dir_url( __FILE__ ) );
 define( 'RMSP_DIR', plugin_dir_path( __FILE__ ) );
 
