@@ -17,13 +17,16 @@ use RankMathSitemapsPolylang\Url_Helper;
  */
 final class Url_Helper_Test extends TestCase {
 
+	private Url_Helper $urls;
+
 	protected function setUp(): void {
 		parent::setUp();
 		rmsp_test_reset_state();
+		$this->urls = new Url_Helper();
 	}
 
 	public function test_parse_sitemap_filename_post_page_one(): void {
-		$result = Url_Helper::parse_sitemap_filename( '/post-sitemap.xml' );
+		$result = $this->urls->parse_sitemap_filename( '/post-sitemap.xml' );
 
 		$this->assertSame(
 			[
@@ -35,7 +38,7 @@ final class Url_Helper_Test extends TestCase {
 	}
 
 	public function test_parse_sitemap_filename_prefixed_page_two(): void {
-		$result = Url_Helper::parse_sitemap_filename( '/en/post-sitemap2.xml' );
+		$result = $this->urls->parse_sitemap_filename( '/en/post-sitemap2.xml' );
 
 		$this->assertSame(
 			[
@@ -47,7 +50,7 @@ final class Url_Helper_Test extends TestCase {
 	}
 
 	public function test_parse_sitemap_filename_subdirectory_install(): void {
-		$result = Url_Helper::parse_sitemap_filename( '/site/en/page-sitemap.xml' );
+		$result = $this->urls->parse_sitemap_filename( '/site/en/page-sitemap.xml' );
 
 		$this->assertSame(
 			[
@@ -59,11 +62,11 @@ final class Url_Helper_Test extends TestCase {
 	}
 
 	public function test_parse_sitemap_filename_invalid(): void {
-		$this->assertNull( Url_Helper::parse_sitemap_filename( '/feed.xml' ) );
+		$this->assertNull( $this->urls->parse_sitemap_filename( '/feed.xml' ) );
 	}
 
 	public function test_parse_sitemap_filename_full_url(): void {
-		$result = Url_Helper::parse_sitemap_filename( 'https://example.com/post-sitemap.xml?foo=1' );
+		$result = $this->urls->parse_sitemap_filename( 'https://example.com/post-sitemap.xml?foo=1' );
 
 		$this->assertSame(
 			[

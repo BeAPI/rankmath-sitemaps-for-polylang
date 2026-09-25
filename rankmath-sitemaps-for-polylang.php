@@ -15,6 +15,10 @@
  * Domain Path:       /languages
  */
 
+namespace RankMathSitemapsPolylang;
+
+use RankMath\Sitemap\Router as Rank_Math_Router;
+
 defined( 'ABSPATH' ) || exit;
 
 define( 'RMSP_VERSION', '1.0.0' );
@@ -50,7 +54,7 @@ function rmsp_bootstrap(): void {
 		return;
 	}
 
-	if ( ! class_exists( '\RankMath\Sitemap\Router' ) ) {
+	if ( ! class_exists( Rank_Math_Router::class ) ) {
 		return;
 	}
 
@@ -60,24 +64,27 @@ function rmsp_bootstrap(): void {
 		return;
 	}
 
-	\RankMathSitemapsPolylang\Plugin::instance()->boot();
+	Plugin::instance()->boot();
 }
-add_action( 'pll_init', 'rmsp_bootstrap', 5 );
+
+add_action(
+	'pll_init',
+	static function (): void {
+		rmsp_bootstrap();
+	},
+	5
+);
 
 register_activation_hook(
 	__FILE__,
 	static function (): void {
-		// WordPress only persists rewrite rules registered during this request.
-		\RankMathSitemapsPolylang\Router::register_rewrites();
-		flush_rewrite_rules( false );
-		\RankMathSitemapsPolylang\Plugin::clear_sitemap_caches();
+		Plugin::instance()->on_activation();
 	}
 );
 
 register_deactivation_hook(
 	__FILE__,
 	static function (): void {
-		\RankMathSitemapsPolylang\Plugin::clear_sitemap_caches();
-		\RankMathSitemapsPolylang\Router::flush_rewrites_on_deactivation();
+		Plugin::instance()->on_deactivation();
 	}
 );

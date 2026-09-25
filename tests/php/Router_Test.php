@@ -11,11 +11,19 @@ namespace RankMathSitemapsPolylang\Tests;
 
 use PHPUnit\Framework\TestCase;
 use RankMathSitemapsPolylang\Router;
+use RankMathSitemapsPolylang\Url_Helper;
 
 /**
  * @covers \RankMathSitemapsPolylang\Router
  */
 final class Router_Test extends TestCase {
+
+	private Router $router;
+
+	protected function setUp(): void {
+		parent::setUp();
+		$this->router = new Router( new Url_Helper() );
+	}
 
 	public function test_strip_language_sitemap_rules_removes_only_plugin_rules(): void {
 		$rules = [
@@ -24,7 +32,7 @@ final class Router_Test extends TestCase {
 			'^page-sitemap.xml$' => 'index.php?sitemap=page',
 		];
 
-		$result = Router::strip_language_sitemap_rules( $rules );
+		$result = $this->router->strip_language_sitemap_rules( $rules );
 
 		$this->assertSame(
 			[
@@ -36,7 +44,7 @@ final class Router_Test extends TestCase {
 	}
 
 	public function test_strip_language_sitemap_rules_empty_input(): void {
-		$this->assertSame( [], Router::strip_language_sitemap_rules( [] ) );
+		$this->assertSame( [], $this->router->strip_language_sitemap_rules( [] ) );
 	}
 
 	public function test_strip_language_sitemap_rules_all_plugin_rules(): void {
@@ -45,6 +53,6 @@ final class Router_Test extends TestCase {
 			'^de/([^/]+?)-sitemap.xml$' => 'index.php?sitemap=$matches[1]&rm_sitemap_lang=de',
 		];
 
-		$this->assertSame( [], Router::strip_language_sitemap_rules( $rules ) );
+		$this->assertSame( [], $this->router->strip_language_sitemap_rules( $rules ) );
 	}
 }
