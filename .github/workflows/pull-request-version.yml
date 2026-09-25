@@ -1,0 +1,24 @@
+name: "Check plugin version and release files"
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  version-check:
+    name: "Version bump, tag, and file checks"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --tags --prune origin
+
+      - name: Verify version bump and release files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: tests/bin/check-release-version.sh

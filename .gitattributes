@@ -1,0 +1,27 @@
+# Directories
+/.git export-ignore
+/.github export-ignore
+/.wordpress-org export-ignore
+/node_modules export-ignore
+/src export-ignore
+/tests export-ignore
+/docs export-ignore
+
+# Configuration files
+/.distignore export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.plugin-data export-ignore
+/.wp-env.json export-ignore
+/grumphp.yml export-ignore
+/phpcs.xml.dist export-ignore
+
+# Dependency management
+/composer.lock export-ignore
+/package.json export-ignore
+/package-lock.json export-ignore
+
+# Documentation (GitHub)
+/README.md export-ignore
+/DEPLOYMENT.md export-ignore
