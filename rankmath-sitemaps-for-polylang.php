@@ -3,9 +3,10 @@
  * Plugin Name:       Rank Math Sitemaps for Polylang
  * Plugin URI:        https://github.com/beapi/rankmath-sitemaps-for-polylang
  * Description:       Serves one Rank Math XML sitemap per Polylang language (directory mode, hide_default).
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.5
- * Requires PHP:      7.4
+ * Tested up to:      7.1.2
+ * Requires PHP:      8.1
  * Requires Plugins:  seo-by-rank-math
  * Author:            Be API
  * Author URI:        https://beapi.fr
@@ -15,10 +16,14 @@
  * Domain Path:       /languages
  */
 
+namespace RankMathSitemapsPolylang;
+
+use RankMath\Sitemap\Router as Rank_Math_Router;
+
 defined( 'ABSPATH' ) || exit;
 
-define( 'RMSP_VERSION', '1.0.0' );
-define( 'RMSP_FILE', __FILE__ );
+define( 'RMSP_VERSION', '1.1.0' );
+define( 'RMSP_URL', plugin_dir_url( __FILE__ ) );
 define( 'RMSP_DIR', plugin_dir_path( __FILE__ ) );
 
 $rmsp_autoload = RMSP_DIR . 'vendor/autoload.php';
@@ -50,7 +55,7 @@ function rmsp_bootstrap(): void {
 		return;
 	}
 
-	if ( ! class_exists( '\RankMath\Sitemap\Router' ) ) {
+	if ( ! class_exists( Rank_Math_Router::class ) ) {
 		return;
 	}
 
@@ -60,24 +65,27 @@ function rmsp_bootstrap(): void {
 		return;
 	}
 
-	\RankMathSitemapsPolylang\Plugin::instance()->boot();
+	Plugin::instance()->boot();
 }
-add_action( 'pll_init', 'rmsp_bootstrap', 5 );
+
+add_action(
+	'pll_init',
+	static function (): void {
+		rmsp_bootstrap();
+	},
+	5
+);
 
 register_activation_hook(
 	__FILE__,
 	static function (): void {
-		// WordPress only persists rewrite rules registered during this request.
-		\RankMathSitemapsPolylang\Router::register_rewrites();
-		flush_rewrite_rules( false );
-		\RankMathSitemapsPolylang\Plugin::clear_sitemap_caches();
+		Plugin::instance()->on_activation();
 	}
 );
 
 register_deactivation_hook(
 	__FILE__,
 	static function (): void {
-		\RankMathSitemapsPolylang\Plugin::clear_sitemap_caches();
-		\RankMathSitemapsPolylang\Router::flush_rewrites_on_deactivation();
+		Plugin::instance()->on_deactivation();
 	}
 );

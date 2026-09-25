@@ -5,7 +5,7 @@ Serves one Rank Math XML sitemap per Polylang language in directory mode with `h
 ## Requirements
 
 - WordPress 6.5+
-- PHP 7.4+
+- PHP 8.1+
 - [Rank Math SEO](https://wordpress.org/plugins/seo-by-rank-math/)
 - Polylang or Polylang Pro in directory mode (`force_lang` 0 or 1) with `hide_default` enabled
 
@@ -22,7 +22,7 @@ Copy the plugin folder to `wp-content/plugins/`, run `composer install --no-dev`
 When the package is published on `composer.beapi.fr`:
 
 ```bash
-composer require beapi/rankmath-sitemaps-for-polylang:1.0.0
+composer require beapi/rankmath-sitemaps-for-polylang:1.1.0
 ```
 
 Ensure Rank Math and Polylang are active before relying on sitemap URLs.

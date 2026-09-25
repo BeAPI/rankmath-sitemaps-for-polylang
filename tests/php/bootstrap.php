@@ -11,6 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', true );
 }
 
+if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
+	define( 'HOUR_IN_SECONDS', 3600 );
+}
+
+if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+	define( 'DAY_IN_SECONDS', 86400 );
+}
+
 $autoload = dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 if ( ! is_readable( $autoload ) ) {
 	fwrite( STDERR, "Run composer install first.\n" );
@@ -25,13 +33,17 @@ $GLOBALS['rmsp_test_options'] = [];
 /** @var array<string, mixed> */
 $GLOBALS['rmsp_test_query_vars'] = [];
 
+/** @var array<string, bool> */
+$GLOBALS['rmsp_test_language_terms'] = [];
+
 /**
  * Resets stubbed WordPress state between tests.
  */
 function rmsp_test_reset_state(): void {
-	$GLOBALS['rmsp_test_options']     = [];
-	$GLOBALS['rmsp_test_query_vars'] = [];
-	\RankMathSitemapsPolylang\Url_Helper::end_availability_check();
+	$GLOBALS['rmsp_test_options']        = [];
+	$GLOBALS['rmsp_test_query_vars']     = [];
+	$GLOBALS['rmsp_test_language_terms'] = [];
+	$_SERVER['REQUEST_URI']              = '';
 }
 
 if ( ! function_exists( 'wp_parse_url' ) ) {
@@ -106,5 +118,60 @@ if ( ! function_exists( 'sanitize_key' ) ) {
 		$key = strtolower( (string) $key );
 
 		return preg_replace( '/[^a-z0-9_\-]/', '', $key ) ?? '';
+	}
+}
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	/**
+	 * @param string $str String.
+	 * @return string
+	 */
+	function sanitize_text_field( $str ) {
+		return is_string( $str ) ? trim( $str ) : '';
+	}
+}
+
+if ( ! function_exists( 'wp_unslash' ) ) {
+	/**
+	 * @param mixed $value Value.
+	 * @return mixed
+	 */
+	function wp_unslash( $value ) {
+		if ( is_string( $value ) ) {
+			return stripslashes( $value );
+		}
+
+		return $value;
+	}
+}
+
+if ( ! function_exists( 'taxonomy_exists' ) ) {
+	/**
+	 * @param string $taxonomy Taxonomy.
+	 * @return bool
+	 */
+	function taxonomy_exists( $taxonomy ) {
+		return 'language' === $taxonomy;
+	}
+}
+
+if ( ! function_exists( 'get_term_by' ) ) {
+	/**
+	 * @param string     $field    Field.
+	 * @param string|int $value    Value.
+	 * @param string     $taxonomy Taxonomy.
+	 * @return object|false
+	 */
+	function get_term_by( $field, $value, $taxonomy ) {
+		$terms = $GLOBALS['rmsp_test_language_terms'] ?? [];
+
+		if ( 'slug' !== $field || 'language' !== $taxonomy || ! isset( $terms[ $value ] ) ) {
+			return false;
+		}
+
+		$term       = new \stdClass();
+		$term->slug = (string) $value;
+
+		return $term;
 	}
 }

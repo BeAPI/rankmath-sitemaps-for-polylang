@@ -11,10 +11,11 @@ $rmsp_autoload = $rmsp_dir . 'vendor/autoload.php';
 if ( is_readable( $rmsp_autoload ) ) {
 	require_once $rmsp_autoload;
 } else {
-	require_once $rmsp_dir . 'includes/Transient_Versions.php';
-	require_once $rmsp_dir . 'includes/Sitemap_Availability.php';
+	require_once $rmsp_dir . 'includes/Url_Helper.php';
 	require_once $rmsp_dir . 'includes/Sitemap_Cache.php';
 }
 
-\RankMathSitemapsPolylang\Sitemap_Cache::clear_all();
-\RankMathSitemapsPolylang\Transient_Versions::delete_options();
+$cache = new \RankMathSitemapsPolylang\Sitemap_Cache( new \RankMathSitemapsPolylang\Url_Helper() );
+
+$cache->clear_all();
+$cache->delete_version_options();

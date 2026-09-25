@@ -2,7 +2,9 @@
 
 namespace RankMathSitemapsPolylang;
 
-defined( 'ABSPATH' ) || exit;
+use PLL_Language;
+use RankMath\ThirdParty\Polylang\Polylang as Rank_Math_Polylang;
+use WP_Hook;
 
 /**
  * Removes Rank Math mixed-language sitemap filters.
@@ -11,35 +13,40 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Rank_Math_Overrides {
 
-	private const RM_POLYLANG_CLASS = \RankMath\ThirdParty\Polylang\Polylang::class;
+	private const RM_POLYLANG_CLASS = Rank_Math_Polylang::class;
 
-	public static function neutralize(): void {
-		$instance = new self();
+	private Url_Helper $urls;
 
-		$instance->remove_rm_polylang_filter( 'rank_math/sitemap/post_count/join', 'sitemap_join_clause' );
-		$instance->remove_rm_polylang_filter( 'rank_math/sitemap/get_posts/join', 'sitemap_join_clause' );
-		$instance->remove_rm_polylang_filter( 'rank_math/sitemap/post_count/where', 'sitemap_where_clause' );
-		$instance->remove_rm_polylang_filter( 'rank_math/sitemap/get_posts/where', 'sitemap_where_clause' );
-		$instance->remove_rm_polylang_filter( 'get_terms_args', 'update_term_query_args' );
-		$instance->remove_rm_polylang_filter( 'rank_math/sitemap/exclude_post_type', 'inject_language_sitemap_entries', 0 );
+	public function __construct( Url_Helper $urls ) {
+		$this->urls = $urls;
+	}
 
-		add_filter( 'rank_math/sitemap/post_count/join', [ $instance, 'sitemap_join_clause' ], 10, 2 );
-		add_filter( 'rank_math/sitemap/get_posts/join', [ $instance, 'sitemap_join_clause' ], 10, 2 );
-		add_filter( 'rank_math/sitemap/post_count/where', [ $instance, 'sitemap_where_clause' ], 10, 2 );
-		add_filter( 'rank_math/sitemap/get_posts/where', [ $instance, 'sitemap_where_clause' ], 10, 2 );
-		add_filter( 'get_terms_args', [ $instance, 'update_term_query_args' ] );
+	/**
+	 * Replace Rank Math Polylang sitemap integration with per-urlset language filters.
+	 */
+	public function register_hooks(): void {
+		$this->remove_rm_polylang_filter( 'rank_math/sitemap/post_count/join', 'sitemap_join_clause' );
+		$this->remove_rm_polylang_filter( 'rank_math/sitemap/get_posts/join', 'sitemap_join_clause' );
+		$this->remove_rm_polylang_filter( 'rank_math/sitemap/post_count/where', 'sitemap_where_clause' );
+		$this->remove_rm_polylang_filter( 'rank_math/sitemap/get_posts/where', 'sitemap_where_clause' );
+		$this->remove_rm_polylang_filter( 'get_terms_args', 'update_term_query_args' );
+		$this->remove_rm_polylang_filter( 'rank_math/sitemap/exclude_post_type', 'inject_language_sitemap_entries', 0 );
+
+		add_filter( 'rank_math/sitemap/post_count/join', [ $this, 'sitemap_join_clause' ], 10, 2 );
+		add_filter( 'rank_math/sitemap/get_posts/join', [ $this, 'sitemap_join_clause' ], 10, 2 );
+		add_filter( 'rank_math/sitemap/post_count/where', [ $this, 'sitemap_where_clause' ], 10, 2 );
+		add_filter( 'rank_math/sitemap/get_posts/where', [ $this, 'sitemap_where_clause' ], 10, 2 );
+		add_filter( 'get_terms_args', [ $this, 'update_term_query_args' ] );
 	}
 
 	/**
 	 * Add Polylang JOIN for per-language urlset queries only.
 	 *
-	 * The sitemap index uses unfiltered post counts; language filters apply when serving urlsets.
-	 *
 	 * @param string $sql       Existing JOIN clause.
 	 * @param string $post_type Post type being queried.
 	 */
 	public function sitemap_join_clause( string $sql, string $post_type ): string {
-		if ( Url_Helper::is_index_request() || ! pll_is_translated_post_type( $post_type ) ) {
+		if ( $this->urls->is_index_request() || ! pll_is_translated_post_type( $post_type ) ) {
 			return $sql;
 		}
 
@@ -53,13 +60,13 @@ final class Rank_Math_Overrides {
 	 * @param string $post_type Post type being queried.
 	 */
 	public function sitemap_where_clause( string $sql, string $post_type ): string {
-		if ( Url_Helper::is_index_request() || ! pll_is_translated_post_type( $post_type ) ) {
+		if ( $this->urls->is_index_request() || ! pll_is_translated_post_type( $post_type ) ) {
 			return $sql;
 		}
 
-		$language = PLL()->model->get_language( Url_Helper::get_target_language() );
+		$language = PLL()->model->get_language( $this->urls->get_target_language() );
 
-		if ( ! $language instanceof \PLL_Language ) {
+		if ( ! $language instanceof PLL_Language ) {
 			return $sql;
 		}
 
@@ -72,11 +79,11 @@ final class Rank_Math_Overrides {
 	 * @param array $args get_terms() arguments.
 	 */
 	public function update_term_query_args( array $args ): array {
-		if ( ! Url_Helper::is_sitemap_request() || Url_Helper::is_index_request() ) {
+		if ( ! $this->urls->is_sitemap_request() || $this->urls->is_index_request() ) {
 			return $args;
 		}
 
-		$args['lang'] = Url_Helper::get_target_language();
+		$args['lang'] = $this->urls->get_target_language();
 
 		return $args;
 	}
@@ -84,9 +91,12 @@ final class Rank_Math_Overrides {
 	/**
 	 * Remove a Rank Math Polylang callback without holding its instance.
 	 *
-	 * @param string      $hook     Filter hook.
-	 * @param string      $method   Method name.
-	 * @param int|null    $priority Optional priority.
+	 * Walks `$wp_filter` for callbacks whose object is Rank Math's Polylang class
+	 * and whose method matches `$method`.
+	 *
+	 * @param string   $hook     Filter hook (e.g. `rank_math/sitemap/get_posts/join`).
+	 * @param string   $method   Method name on Rank Math's Polylang class.
+	 * @param int|null $priority Optional priority to match; null checks every priority.
 	 */
 	private function remove_rm_polylang_filter( string $hook, string $method, ?int $priority = null ): void {
 		global $wp_filter;
@@ -97,7 +107,7 @@ final class Rank_Math_Overrides {
 
 		$hook_object = $wp_filter[ $hook ];
 
-		if ( ! $hook_object instanceof \WP_Hook ) {
+		if ( ! $hook_object instanceof WP_Hook ) {
 			return;
 		}
 
