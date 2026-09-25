@@ -2,10 +2,10 @@
 Contributors: beapi
 Tags: rank-math, polylang, sitemap, seo, multilingual
 Requires at least: 6.5
-Tested up to: 6.7
-Requires PHP: 7.4
+Tested up to: 7.1
+Requires PHP: 8.1
 Requires Plugins: seo-by-rank-math
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,9 @@ Multi-domain Polylang setups (`force_lang` > 1) are left to Rank Math native beh
 3. Ensure Rank Math and Polylang are active.
 
 == Changelog ==
+
+= 1.1.0 =
+* Simplify sitemap services and cache invalidation.
 
 = 1.0.0 =
 * Initial release.
